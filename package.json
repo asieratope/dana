@@ -1,0 +1,16 @@
+{
+  "name": "dana-help-app",
+  "version": "1.0.0",
+  "description": "Aplicación para solicitar ayuda durante la DANA en Valencia",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server"
+  },
+  "dependencies": {
+    "leaflet": "^1.7.1",
+    "@emailjs/browser": "^4.0.0",
+    "live-server": "^1.2.1"
+  },
+  "author": "Tu Nombre",
+  "license": "ISC"
+}
