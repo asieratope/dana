@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Interactivo de la Comunidad Valenciana</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css"> <!-- Archivo CSS externo -->
+</head>
+<body>
+    <header>
+        <h1>Ayuda para la DANA en Valencia</h1>
+        <p>Selecciona tu ubicación en el mapa y envía una solicitud de ayuda.</p>
+    </header>
+    <div id="map"></div>
+
+    <div id="form-container">
+        <h3>Solicitar Ayuda</h3>
+        <form id="helpRequestForm">
+            <label for="location">Ubicación Seleccionada:</label>
+            <input type="text" id="location" readonly required>
+            
+            <label for="phonePrefix">Prefijo:</label>
+            <select id="phonePrefix" required>
+                <option value="+34">+34 (España)</option>
+                <option value="+351">+351 (Portugal)</option>
+                <option value="+33">+33 (Francia)</option>
+            </select>
+            
+            <label for="phoneNumber">Teléfono:</label>
+            <input type="tel" id="phoneNumber" required>
+            
+            <button type="button" id="currentLocationButton">Usar Ubicación Actual</button>
+            
+            <label for="message">Descripción:</label>
+            <textarea id="message" required></textarea>
+            
+            <label for="helpType">Tipo de Ayuda:</label>
+            <select id="helpType" required>
+                <option value="comida">Comida</option>
+                <option value="ropa">Ropa</option>
+                <option value="emergencia">Emergencia</option>
+            </select>
+            
+            <div id="emergencyLevelContainer" style="display:none;">
+                <label for="emergencyLevel">Nivel de Emergencia:</label>
+                <select id="emergencyLevel">
+                    <option value="bajo">Bajo</option>
+                    <option value="medio">Medio</option>
+                    <option value="alto">Alto</option>
+                </select>
+            </div>
+
+            <button type="submit">Enviar Solicitud</button>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("bSgx7-OGffEdiHrPu"); // Cambia con tu clave pública de EmailJS
+        })();
+
+        var map = L.map('map').setView([39.4702, -0.3768], 7);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var valenciaPolygon = L.polygon([
+            [37.886, -1.4],
+            [40.5, -1.4],
+            [40.5, 0.5],
+            [37.886, 0.5]
+        ], {
+            color: 'red',
+            weight: 2,
+            fillOpacity: 0
+        }).addTo(map);
+
+        var selectedLocation = null;
+        var currentMarker = null;
+
+        function handleLocationSelection(latlng) {
+            selectedLocation = latlng;
+
+            if (!valenciaPolygon.getBounds().contains(selectedLocation)) {
+                alert("Fuera del rango: solo la Comunidad Valenciana");
+                return;
+            }
+
+            document.getElementById('location').value = `${selectedLocation.lat}, ${selectedLocation.lng}`;
+
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            currentMarker = L.marker(selectedLocation).addTo(map)
+                .bindPopup('Ubicación seleccionada')
+                .openPopup();
+        }
+
+        map.on('click', function(e) {
+            handleLocationSelection(e.latlng);
+        });
+
+        document.getElementById('currentLocationButton').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latlng = L.latLng(position.coords.latitude, position.coords.longitude);
+                    handleLocationSelection(latlng);
+                    map.setView(latlng, 12);
+                }, function() {
+                    alert("No se pudo obtener la ubicación actual.");
+                });
+            } else {
+                alert("Geolocalización no soportada en este navegador.");
+            }
+        });
+
+        document.getElementById('helpType').addEventListener('change', function() {
+            var helpType = this.value;
+            document.getElementById('emergencyLevelContainer').style.display = helpType === 'emergencia' ? 'block' : 'none';
+        });
+
+        document.getElementById('helpRequestForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var location = document.getElementById('location').value;
+            var message = document.getElementById('message').value;
+            var phonePrefix = document.getElementById('phonePrefix').value;
+            var phoneNumber = document.getElementById('phoneNumber').value;
+            var fullPhoneNumber = phonePrefix + " " + phoneNumber;
+            var helpType = document.getElementById('helpType').value;
+            var emergencyLevel = helpType === 'emergencia' ? document.getElementById('emergencyLevel').value : null;
+
+            emailjs.send("service_2dos173", "template_aqjadsl", {
+                location: location,
+                message: message,
+                phoneNumber: fullPhoneNumber,
+                helpType: helpType,
+                emergencyLevel: emergencyLevel
+            })
+            .then(function(response) {
+                console.log('Éxito!', response.status, response.text);
+                alert('Solicitud enviada! Te avisaremos cuando la revisemos.');
+                document.getElementById('helpRequestForm').reset();
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                    currentMarker = null;
+                }
+                document.getElementById('emergencyLevelContainer').style.display = 'none'; // Ocultar nivel de emergencia después de enviar
+            }, function(error) {
+                console.log('Error:', error);
+                alert('Hubo un error al enviar tu solicitud.');
+            });
+        });
+    </script>
+</body>
+</html>

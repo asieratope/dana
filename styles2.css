@@ -1,0 +1,75 @@
+/* Estilos para la página de información */
+body {
+    background-color: #f4f4f9; /* Fondo suave para toda la página */
+    font-family: 'Arial', sans-serif; /* Fuente general */
+}
+
+.info-container {
+    background-color: #ffffff; /* Fondo blanco para el contenedor */
+    padding: 30px; /* Espaciado interno */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    max-width: 800px; /* Ancho máximo del contenedor */
+    margin: 40px auto; /* Centrado automático con margen superior */
+    transition: transform 0.3s ease; /* Transición al pasar el mouse */
+}
+
+.info-container:hover {
+    transform: translateY(-5px); /* Efecto de elevación al pasar el mouse */
+}
+
+.info-container h2 {
+    text-align: center; /* Centrado del título */
+    color: #4a90e2; /* Color azul */
+    font-size: 2em; /* Tamaño de fuente mayor */
+    margin-bottom: 20px; /* Margen inferior */
+    border-bottom: 2px solid #4a90e2; /* Línea debajo del título */
+    padding-bottom: 10px; /* Espaciado interno inferior */
+}
+
+.info-container p {
+    margin: 15px 0; /* Margen vertical */
+    line-height: 1.6; /* Mayor altura de línea para mejor lectura */
+    text-align: justify; /* Texto justificado */
+    color: #555; /* Color de texto gris oscuro */
+}
+
+.info-container ul {
+    margin: 15px 0; /* Margen vertical */
+    padding-left: 20px; /* Espaciado interno a la izquierda */
+    list-style-type: disc; /* Estilo de lista con viñetas */
+}
+
+.info-container ul li {
+    margin-bottom: 10px; /* Margen inferior en los elementos de lista */
+    position: relative; /* Para el pseudo-elemento */
+    padding-left: 15px; /* Espaciado a la izquierda para el pseudo-elemento */
+}
+
+.info-container ul li::before {
+    content: '✔'; /* Marca de verificación */
+    color: #4a90e2; /* Color de la marca */
+    position: absolute; /* Posicionamiento absoluto */
+    left: 0; /* Alineación a la izquierda */
+}
+
+.support-phone {
+    text-align: center; /* Centrado del número de soporte */
+    margin-top: 30px; /* Margen superior */
+    font-size: 1.5em; /* Tamaño de fuente mayor */
+    color: #d9534f; /* Color rojo */
+    font-weight: bold; /* Negrita */
+}
+
+.support-phone span {
+    display: block; /* Para apilar el texto */
+    font-size: 1.2em; /* Tamaño de fuente ligeramente menor */
+    color: #333; /* Color más oscuro */
+}
+
+footer {
+    text-align: center; /* Centrado del pie de página */
+    margin-top: 40px; /* Margen superior */
+    color: #777; /* Color gris */
+    font-size: 0.9em; /* Tamaño de fuente menor */
+}
